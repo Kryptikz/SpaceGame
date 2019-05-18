@@ -21,8 +21,10 @@ public class Display extends JComponent{
         screenobjects = new ArrayList<ZObject>();
         stars = new ArrayList<ZObject>();
         w=a=s=d=false;
-        for(int i=0;i<250;i++) {
-            stars.add(new ZObject(new OtherPoint((Math.random()*100)-50,(Math.random()*100)-50,(Math.random()*100)-50),Color.WHITE));
+        for(int i=0;i<10000;i++) {
+            Color[] starcolors = new Color[]{Color.WHITE,new Color(255,167,0),new Color(0,204,255),new Color(255,0,204)};
+            Color scol = starcolors[(int)(Math.random()*starcolors.length)];
+            stars.add(new ZObject(new OtherPoint((Math.random()*800)-400,(Math.random()*800)-400,(Math.random()*800)-400),scol));
         }
         (new Thread(new FrameThread(this,60))).start();
     }
