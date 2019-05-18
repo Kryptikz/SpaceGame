@@ -10,7 +10,16 @@ public class ZObject implements Comparable<ZObject> {
     Color c;
     boolean touched = false;
     public ZObject() {
-    }    
+    }
+    public ZObject(OtherPoint pone) {
+        type = "Point";
+        p1=pone;
+    }
+    public ZObject(OtherPoint pone, Color co) {
+        type = "Point";
+        p1=pone;
+        c=co;
+    }
     public ZObject(OtherPoint pone, OtherPoint ptwo) {
         type = "Vector";
         p1 = pone;
@@ -71,8 +80,10 @@ public class ZObject implements Comparable<ZObject> {
             return (p1.getZ()+p2.getZ()+p3.getZ())/3;
         } else if (type.equals("Quad")) {
             return (p1.getZ()+p2.getZ()+p3.getZ()+p4.getZ())/4;
-        } else {
+        } else if (type.equals("Vector")) {
             return (p1.getZ()+p2.getZ())/2;
+        } else {
+            return p1.getZ();
         }
     }
     public String getType() {

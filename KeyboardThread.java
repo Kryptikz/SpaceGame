@@ -8,6 +8,9 @@ public class KeyboardThread extends KeyAdapter {
     boolean d;
     boolean w;
     boolean s;
+    public KeyboardThread(Display d) {
+        dis=d;
+    }
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_A) {
