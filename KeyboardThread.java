@@ -25,6 +25,27 @@ public class KeyboardThread extends KeyAdapter {
         if (key == KeyEvent.VK_S) {
             dis.sPress();
         }
+        if (key == KeyEvent.VK_UP) {
+            dis.upPress();
+        }
+        if (key == KeyEvent.VK_DOWN) {
+            dis.downPress();
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            dis.rightPress();
+        }
+        if (key == KeyEvent.VK_LEFT) {
+            dis.leftPress();
+        }
+        if (key == KeyEvent.VK_SPACE) {
+            dis.spacePress();
+        }
+        if (key == KeyEvent.VK_E) {
+            dis.ePress();
+        }
+        if (key == KeyEvent.VK_Q) {
+            dis.qPress();
+        }
     }
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
@@ -39,6 +60,27 @@ public class KeyboardThread extends KeyAdapter {
         }
         if (key == KeyEvent.VK_S) {
             dis.sRelease();
-        }    
+        }
+        if (key == KeyEvent.VK_UP) {
+            dis.upRelease();
+        }
+        if (key == KeyEvent.VK_DOWN) {
+            dis.downRelease();
+        }
+        if (key == KeyEvent.VK_RIGHT) {
+            dis.rightRelease();
+        }
+        if (key == KeyEvent.VK_LEFT) {
+            dis.leftRelease();
+        }
+        if (key == KeyEvent.VK_SPACE) {
+            dis.spaceRelease();
+        }
+        if (key == KeyEvent.VK_E) {
+            dis.eRelease();
+        }
+        if (key == KeyEvent.VK_Q) {
+            dis.qRelease();
+        }
     }
 }       
