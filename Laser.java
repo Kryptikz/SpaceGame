@@ -3,8 +3,12 @@ public class Laser implements Runnable {
     double[] loc;
     double[] direction;
     boolean paused;
+    int ops;
+    boolean dead;
     public Laser(double startx, double starty, double startz, double magx, double magy, double magz, double maxspeed) {
         paused=false;
+        dead=false;
+        ops=0;
         loc = new double[]{startx,starty,startz};
         double largest = magx;
         double offset = 1;
@@ -47,9 +51,13 @@ public class Laser implements Runnable {
         }*/
     }
     public void update() {
+        ops++;
         loc[0]-=direction[0];
         loc[1]-=direction[1];
         loc[2]-=direction[2];
+        if (ops>=1800) {
+            dead=true;
+        }
     }
     public double[] getLocation() {
         return loc;
@@ -80,5 +88,8 @@ public class Laser implements Runnable {
         direction[0]=point.getX();
         direction[1]=point.getY();
         direction[2]=point.getZ();
+    }
+    public boolean isDead() {
+        return dead;
     }
 }

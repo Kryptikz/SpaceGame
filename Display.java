@@ -153,13 +153,23 @@ public class Display extends JComponent{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        for(Laser l : lasers) {
+        for(int li=0;li<lasers.size();li++) {
+            Laser l = lasers.get(li);
             l.update();
+            if (l.isDead()) {
+                lasers.remove(li);
+                li--;
+            }
+        }
+        try {
+            Thread.sleep(1);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     public void shootLaser() {
         //Laser l = new Laser(0,-5,0,momenx,momeny,momenz,maxspeed);
-        Laser l = new Laser(0,5,20,0,0,-Math.abs(momenz),maxspeed);
+        Laser l = new Laser(0,5,20,0,0,-maxspeed,maxspeed);
         (new Thread(l)).start();
         lasers.add(l);
     }
