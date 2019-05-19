@@ -19,7 +19,7 @@ public class Laser implements Runnable {
             largest=magz;
         }
         if (largest!=0) {
-            offset = 3*Math.abs(maxspeed/largest);
+            offset = 100*Math.abs(maxspeed/largest);
         } else {
             offset=0;
         }

@@ -4,6 +4,7 @@ import java.util.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.imageio.ImageIO;
+import java.awt.geom.Point2D;
 public class Display extends JComponent{
     private final int FOV = 90;
     private final int ASPECT = 1;
@@ -18,18 +19,20 @@ public class Display extends JComponent{
     private double momeny;
     private double momenz;
     private final double maxspeed = 12;
+    private boolean hold;
     public Display(){
         screenobjects = new ArrayList<ZObject>();
         stars = new ArrayList<ZObject>();
         lasers = new ArrayList<Laser>();
         w=a=s=d=up=down=right=left=space=e=q=false;
+        hold=false;
         for(int i=0;i<10000;i++) {
             Color[] starcolors = new Color[]{Color.WHITE,new Color(255,167,0),new Color(0,204,255),new Color(255,0,204)};
             Color scol = starcolors[(int)(Math.random()*starcolors.length)];
             stars.add(new ZObject(new OtherPoint((Math.random()*40000)-20000,(Math.random()*40000)-20000,(Math.random()*40000)-20000),scol));
         }
         momenx=momeny=momenz=.01;
-        (new Thread(new FrameThread(this,60))).start();
+        (new Thread(new FrameThread(this,100))).start();
     }
     public void update() {
         double mov = .05;
@@ -149,7 +152,7 @@ public class Display extends JComponent{
             lasers.get(i).setDirection(laserdirs.get(i).getOne());
         }
         try {
-            Thread.sleep(1);
+            //Thread.sleep(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -162,7 +165,7 @@ public class Display extends JComponent{
             }
         }
         try {
-            Thread.sleep(1);
+            //Thread.sleep(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,10 +177,19 @@ public class Display extends JComponent{
         lasers.add(l);
     }
     public void redraw(){
+        hold=true;
         super.repaint();
+        while(hold) {
+            try {
+                Thread.sleep(0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        screenobjects = ZBuffer.sortZ(screenobjects);
         for(ZObject z : screenobjects) {
             if (z.getType().equals("Point")) {
                 double[] oneproj = Calculate.project2Ddouble(new double[]{z.getOne().getX(),z.getOne().getY(),z.getOne().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
@@ -208,13 +220,41 @@ public class Display extends JComponent{
                 g.drawPolygon(xp,yp,4);
             }
         }
+        stars = ZBuffer.sortZ(stars);
         for(ZObject z : stars) {
             if (z.getType().equals("Point")) {
                 double[] oneproj = Calculate.project2Ddouble(new double[]{z.getOne().getX(),z.getOne().getY(),z.getOne().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
                 int x = (int)(oneproj[0]*WIDTH);
                 int y = (int)(oneproj[1]*HEIGHT);
-                g.setColor(z.getColor());
-                g.fillRect(x,y-607,1,1);
+                if (x>-200&&x<WIDTH+200&&y>ACTUALHEIGHT-HEIGHT-100&&y<HEIGHT+100) {
+                    g.setColor(z.getColor());
+                    double starz = z.getZ();
+                    double starx = z.getOne().getZ();
+                    double stary = z.getOne().getY();
+                    double dis = Math.sqrt(((starz*starz)+(starx*starx)+(stary*stary)));
+                    if (dis>10000) {
+                        //if (x>0&&x<WIDTH&&y>ACTUALHEIGHT-HEIGHT&&y<HEIGHT) {
+                            //g2d.fillRect(x,y-607,1,1);
+                            //g2d.setPaint(p);
+                            g.fillRect(x,y-607,1,1);
+                            g.setColor(new Color(z.getColor().getRed(),z.getColor().getGreen(),z.getColor().getBlue(),100));
+                            g.fillOval(x-2,y-607-2,3,3);
+                        //}
+                    } else {
+                        Graphics2D g2d = (Graphics2D)g.create();
+                        RenderingHints hints = new RenderingHints(
+                            RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+                        );
+                        g2d.setRenderingHints(hints);
+                        //int size = (int)((((-50/5000)*starz)+51)+.5);
+                        //int size = (int)Math.sqrt(-dis+1000);
+                        int size = (int)(Math.pow(2,-.001*(-10000+dis)));
+                        
+                        g2d.fillOval(x,y-607,size,size);
+                        g2d.dispose();
+                    }
+                }
+                
             } else if (z.getType().equals("Polygon")) {
                 double[] oneproj = Calculate.project2Ddouble(new double[]{z.getPolygon().getOne().getX(),z.getPolygon().getOne().getY(),z.getPolygon().getOne().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
                 double[] twoproj = Calculate.project2Ddouble(new double[]{z.getPolygon().getTwo().getX(),z.getPolygon().getTwo().getY(),z.getPolygon().getTwo().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
@@ -268,7 +308,7 @@ public class Display extends JComponent{
             g.fillRect(startx,starty,30,10);
             starty-=15;
         }
-        
+        hold=false;
     }
     public void aPress() {
         a=true;
