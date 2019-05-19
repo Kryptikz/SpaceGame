@@ -25,6 +25,12 @@ public class ZObject implements Comparable<ZObject> {
         p1 = pone;
         p2 = ptwo;
     }
+    public ZObject(OtherPoint pone, OtherPoint ptwo, Color co) {
+        type = "Vector";
+        p1 = pone;
+        p2 = ptwo;
+        c=co;
+    }
     public ZObject(OtherPoint pone, OtherPoint ptwo, OtherPoint pthree, Color co) {
         type = "Polygon";
         p1 = pone;

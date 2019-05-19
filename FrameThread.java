@@ -10,8 +10,8 @@ public class FrameThread implements Runnable {
     }
     public void run() {
         while(true) {
-            dis.redraw();
             dis.update();
+            dis.redraw();
             try {
                 Thread.sleep((int)(1000/fps));
             } catch (Exception e) {

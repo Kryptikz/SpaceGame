@@ -12,13 +12,16 @@ public class Display extends JComponent{
     private final int ACTUALHEIGHT = 1080;
     private ArrayList<ZObject> screenobjects;
     private ArrayList<ZObject> stars;
+    private ArrayList<Laser> lasers;
     private boolean w,a,s,d,up,down,right,left,space,e,q;
     private double momenx;
     private double momeny;
     private double momenz;
+    private final double maxspeed = 12;
     public Display(){
         screenobjects = new ArrayList<ZObject>();
         stars = new ArrayList<ZObject>();
+        lasers = new ArrayList<Laser>();
         w=a=s=d=up=down=right=left=space=e=q=false;
         for(int i=0;i<10000;i++) {
             Color[] starcolors = new Color[]{Color.WHITE,new Color(255,167,0),new Color(0,204,255),new Color(255,0,204)};
@@ -32,10 +35,21 @@ public class Display extends JComponent{
         double mov = .05;
         double rot = .01;
         
+        ArrayList<ZObject> laserobjs = new ArrayList<ZObject>();
+        ArrayList<ZObject> laserdirs = new ArrayList<ZObject>();
+        for(Laser l : lasers) {
+            laserobjs.add(l.getZObject());
+            laserdirs.add(l.getDirectionAsZObject());
+        }
+        
         if (e) {
             stars = this.look('z',-rot,stars);
+            laserobjs = this.look('z',-rot,laserobjs);
+            laserdirs = this.look('z',-rot,laserdirs);
         } else if (q) {
             stars = this.look('z',rot,stars);
+            laserobjs = this.look('z',rot,laserobjs);
+            laserdirs = this.look('z',rot,laserdirs);
         }
         
         if (w) {
@@ -73,29 +87,37 @@ public class Display extends JComponent{
         
         
         
-        if(Math.abs(momenx)>12) {
-            momenx=12*(Math.abs(momenx)/momenx);
+        if(Math.abs(momenx)>maxspeed) {
+            momenx=maxspeed*(Math.abs(momenx)/momenx);
         }
-        if(Math.abs(momeny)>12) {
-            momeny=12*(Math.abs(momeny)/momeny);
+        if(Math.abs(momeny)>maxspeed) {
+            momeny=maxspeed*(Math.abs(momeny)/momeny);
         }
-        if(Math.abs(momenz)>12) {
-            momenz=12*(Math.abs(momenz)/momenz);
+        if(Math.abs(momenz)>maxspeed) {
+            momenz=maxspeed*(Math.abs(momenz)/momenz);
         }
         
         
         //System.out.println(momenx + " " + movx);
         if (up) {
             stars = this.look('x',rot,stars);
+            laserobjs = this.look('x',rot,laserobjs);
+            laserdirs = this.look('x',rot,laserdirs);
         }
         if (down) {
             stars = this.look('x',-rot,stars);
+            laserobjs = this.look('x',-rot,laserobjs);
+            laserdirs = this.look('x',-rot,laserdirs);
         }
         if (right) {
             stars = this.look('y',-rot,stars);
+            laserobjs = this.look('y',-rot,laserobjs);
+            laserdirs = this.look('y',-rot,laserdirs);
         } 
         if (left) {
             stars = this.look('y',rot,stars);
+            laserobjs = this.look('y',rot,laserobjs);
+            laserdirs = this.look('y',rot,laserdirs);
         }
         
         if (space) {
@@ -120,6 +142,26 @@ public class Display extends JComponent{
         }
         
         stars = move(movx,movy,movz,stars);
+        laserobjs = move(movx,movy,movz,laserobjs);
+        //laserdirs = move(movx,movy,movz,laserdirs);
+        for(int i=0;i<laserobjs.size();i++) {
+            lasers.get(i).setLocation(laserobjs.get(i).getOne());
+            lasers.get(i).setDirection(laserdirs.get(i).getOne());
+        }
+        try {
+            Thread.sleep(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for(Laser l : lasers) {
+            l.update();
+        }
+    }
+    public void shootLaser() {
+        //Laser l = new Laser(0,-5,0,momenx,momeny,momenz,maxspeed);
+        Laser l = new Laser(0,5,20,0,0,-Math.abs(momenz),maxspeed);
+        (new Thread(l)).start();
+        lasers.add(l);
     }
     public void redraw(){
         super.repaint();
@@ -185,6 +227,15 @@ public class Display extends JComponent{
                 g.setColor(Color.BLACK);
                 g.drawPolygon(xp,yp,4);
             }
+        }
+        for(Laser l : lasers) {
+            ZObject z = l.getZObject();
+            double[] oneproj = Calculate.project2Ddouble(new double[]{z.getPolygon().getOne().getX(),z.getPolygon().getOne().getY(),z.getPolygon().getOne().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
+            double[] twoproj = Calculate.project2Ddouble(new double[]{z.getPolygon().getTwo().getX(),z.getPolygon().getTwo().getY(),z.getPolygon().getTwo().getSpecialZ(),1},FOV,ASPECT,0.0,100.0);
+            int[] xp = new int[]{(int)(WIDTH*oneproj[0]),(int)(WIDTH*twoproj[0])};
+            int[] yp = new int[]{(int)(HEIGHT*oneproj[1])-607,(int)(HEIGHT*twoproj[1])-607};
+            g.setColor(z.getColor());
+            g.drawLine(xp[0],yp[0],xp[1],yp[1]);
         }
         
         g.setColor(new Color(255,0,0,100));

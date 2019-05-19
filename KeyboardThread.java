@@ -46,6 +46,9 @@ public class KeyboardThread extends KeyAdapter {
         if (key == KeyEvent.VK_Q) {
             dis.qPress();
         }
+        if (key == KeyEvent.VK_F) {
+            dis.shootLaser();
+        }
     }
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
